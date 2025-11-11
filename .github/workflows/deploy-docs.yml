@@ -1,0 +1,77 @@
+name: Deploy Documentation
+
+on:
+  # Trigger on push to main branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - '_config.yml'
+      - 'README.md'
+      - '.github/workflows/deploy-docs.yml'
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+# Sets permissions for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: false
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v4
+
+      - name: Install Jekyll and dependencies
+        run: |
+          gem install jekyll bundler
+          bundle init
+          bundle add jekyll
+          bundle add jekyll-seo-tag
+          bundle add jekyll-sitemap
+          bundle add github-pages --group jekyll_plugins
+
+      - name: Build with Jekyll
+        run: |
+          bundle exec jekyll build --source . --destination ./_site
+        env:
+          JEKYLL_ENV: production
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

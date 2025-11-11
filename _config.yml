@@ -1,0 +1,50 @@
+# GitHub Pages Configuration
+theme: jekyll-theme-cayman
+title: MongoDB to SQLite Migration Tool
+description: Migrate MongoDB databases to SQLite/LibSQL with automatic schema inference
+show_downloads: true
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Architecture
+    url: /docs/architecture
+  - title: Usage Guide
+    url: /docs/usage
+  - title: Examples
+    url: /docs/examples
+  - title: Configuration
+    url: /docs/configuration
+  - title: Type Mappings
+    url: /docs/type_mappings
+
+# GitHub repository
+repository: yourusername/mongo-to-sqlite
+
+# SEO
+twitter:
+  card: summary
+  site: '@yourusername'
+
+# Plugins
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Exclude from build
+exclude:
+  - Cargo.toml
+  - Cargo.lock
+  - target/
+  - src/
+  - .gitignore
+  - .env
+  - .env.example
+

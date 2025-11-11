@@ -1,0 +1,42 @@
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Output files
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# Testing
+/test-data/
+
+# Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+Gemfile.lock
+vendor/
+
+# Markdown files (except docs folder and root README/LICENSE/CHANGELOG)
+*.md
+!README.md
+!CHANGELOG.md
+!CONTRIBUTING.md
+!docs/**/*.md

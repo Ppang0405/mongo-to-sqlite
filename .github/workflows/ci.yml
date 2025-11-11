@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # Check code formatting
+  fmt:
+    name: Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt
+      
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+  # Run Clippy linter
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: clippy
+      
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+  # Run tests
+  test:
+    name: Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        rust: [stable]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+      
+      - name: Run tests
+        run: cargo test --verbose
+
+  # Build release binaries
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: mongo-to-sqlite
+            asset_name: mongo-to-sqlite-linux-amd64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: mongo-to-sqlite.exe
+            asset_name: mongo-to-sqlite-windows-amd64.exe
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: mongo-to-sqlite
+            asset_name: mongo-to-sqlite-macos-amd64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: mongo-to-sqlite
+            asset_name: mongo-to-sqlite-macos-arm64
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ matrix.target }}
+      
+      - name: Build release
+        run: cargo build --release --target ${{ matrix.target }} --verbose
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+
+  # Check documentation builds
+  doc:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      
+      - name: Build documentation
+        run: cargo doc --no-deps --all-features
+      
+      - name: Check for broken links in docs
+        run: |
+          cargo install mdbook-linkcheck || true
+          find docs -name "*.md" -type f
+

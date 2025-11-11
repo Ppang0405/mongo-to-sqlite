@@ -1,0 +1,216 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v0.1.0)'
+        required: true
+        type: string
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+permissions:
+  contents: write
+
+jobs:
+  # Create the GitHub release
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: Release ${{ steps.get_version.outputs.version }}
+          body: |
+            ## MongoDB to SQLite Migration Tool ${{ steps.get_version.outputs.version }}
+            
+            ### 📦 Downloads
+            
+            Choose the binary for your platform:
+            
+            | Platform | Architecture | Binary |
+            |----------|--------------|--------|
+            | Linux | x86_64 | `mongo-to-sqlite-linux-amd64` |
+            | macOS | Intel (x86_64) | `mongo-to-sqlite-macos-amd64` |
+            | macOS | Apple Silicon (ARM64) | `mongo-to-sqlite-macos-arm64` |
+            | Windows | x86_64 | `mongo-to-sqlite-windows-amd64.exe` |
+            
+            ### 🚀 Installation
+            
+            **Linux/macOS:**
+            ```bash
+            # Download
+            wget https://github.com/${{ github.repository }}/releases/download/${{ steps.get_version.outputs.version }}/mongo-to-sqlite-linux-amd64
+            
+            # Make executable
+            chmod +x mongo-to-sqlite-linux-amd64
+            
+            # Move to PATH
+            sudo mv mongo-to-sqlite-linux-amd64 /usr/local/bin/mongo-to-sqlite
+            
+            # Verify
+            mongo-to-sqlite --version
+            ```
+            
+            **Windows (PowerShell):**
+            ```powershell
+            # Download
+            Invoke-WebRequest -Uri "https://github.com/${{ github.repository }}/releases/download/${{ steps.get_version.outputs.version }}/mongo-to-sqlite-windows-amd64.exe" -OutFile "mongo-to-sqlite.exe"
+            
+            # Verify
+            .\mongo-to-sqlite.exe --version
+            ```
+            
+            ### 📚 Documentation
+            
+            - [Usage Guide](https://github.com/${{ github.repository }}/blob/main/docs/usage.md)
+            - [Examples](https://github.com/${{ github.repository }}/blob/main/docs/examples.md)
+            - [Configuration](https://github.com/${{ github.repository }}/blob/main/docs/configuration.md)
+            
+            ### 🐛 Issues & Feedback
+            
+            Please report bugs or request features in [Issues](https://github.com/${{ github.repository }}/issues).
+          draft: false
+          prerelease: false
+
+  # Build binaries for all platforms
+  build-release:
+    name: Build Release Binary
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: mongo-to-sqlite
+            asset_name: mongo-to-sqlite-linux-amd64
+            
+          # macOS Intel
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: mongo-to-sqlite
+            asset_name: mongo-to-sqlite-macos-amd64
+            
+          # macOS Apple Silicon
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: mongo-to-sqlite
+            asset_name: mongo-to-sqlite-macos-arm64
+            
+          # Windows
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: mongo-to-sqlite.exe
+            asset_name: mongo-to-sqlite-windows-amd64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+
+      - name: Build release binary
+        run: cargo build --release --target ${{ matrix.target }} --verbose
+
+      - name: Strip binary (Linux and macOS)
+        if: matrix.os != 'windows-latest'
+        run: strip target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.asset_name }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload artifact for testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          retention-days: 7
+
+  # Generate checksums
+  generate-checksums:
+    name: Generate Checksums
+    needs: [create-release, build-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate SHA256 checksums
+        run: |
+          cd artifacts
+          find . -type f -exec sha256sum {} \; | sed 's|./||' | sort -k2 > ../checksums.txt
+          cat ../checksums.txt
+
+      - name: Upload checksums
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: checksums.txt
+          asset_name: checksums.txt
+          asset_content_type: text/plain
+
+  # Publish to crates.io (optional)
+  publish-crate:
+    name: Publish to crates.io
+    needs: build-release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Publish to crates.io
+        run: cargo publish --token ${{ secrets.CARGO_TOKEN }}
+        continue-on-error: true
+
