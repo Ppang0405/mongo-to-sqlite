@@ -1,28 +1,25 @@
-# Quickstart Guide
+# Quick Start Guide
 
 Get up and running with MongoDB to SQLite migration in 5 minutes.
 
 ## Installation
 
-### Option 1: Install from Source
+Download the latest release for your platform from the [Releases page](https://github.com/Ppang0405/mongo-to-sqlite/releases).
+
+Extract and install:
 
 ```bash
-git clone https://github.com/yourusername/mongo-to-sqlite
-cd mongo-to-sqlite
-cargo build --release
-sudo cp target/release/mongo-to-sqlite /usr/local/bin/
-```
+# macOS/Linux
+tar -xzf mongo-to-sqlite-*.tar.gz
+sudo mv mongo-to-sqlite /usr/local/bin/
 
-### Option 2: Using Cargo (once published)
-
-```bash
-cargo install mongo-to-sqlite
+# Or place it in your preferred location
+mv mongo-to-sqlite ~/.local/bin/
 ```
 
 ## Prerequisites
 
 - MongoDB instance running (local or remote)
-- Rust 1.70+ (for building from source)
 
 ## Your First Migration
 
@@ -64,36 +61,7 @@ mongo-to-sqlite \
   --output testdb.db
 ```
 
-You should see output like:
-
-```
-╔════════════════════════════════════════════════╗
-║     MongoDB to SQLite Migration Tool          ║
-║     Powered by LibSQL & Turso                  ║
-╚════════════════════════════════════════════════╝
-
-🔍 Connecting to MongoDB...
-   ✓ Connected to MongoDB
-
-📊 Found 2 collection(s): users, posts
-
-🔗 Connecting to SQLite/LibSQL...
-   ✓ Connected to SQLite/LibSQL
-
-📋 Migrating schema...
-  ✓ Created table: users (5 columns)
-  ✓ Created table: posts (6 columns)
-
-📦 Migrating data...
-  users: 3/3 (100%) ✓
-  posts: 2/2 (100%) ✓
-
-✅ Migration completed successfully!
-   Total documents migrated: 5
-   Tables migrated: 2
-   Time elapsed: 1.23s
-   Output: testdb.db
-```
+You should see output indicating the migration progress and completion status.
 
 ### Step 4: Verify the Data
 
@@ -217,7 +185,7 @@ mongo-to-sqlite \
 
 ### Connection Failed
 
-**Issue**: Can't connect to MongoDB
+**Issue**: Cannot connect to MongoDB
 
 **Solution**: Check MongoDB is running and URI is correct
 
@@ -228,7 +196,7 @@ mongosh mongodb://localhost:27017 --eval "db.adminCommand('ping')"
 
 ### Permission Denied
 
-**Issue**: Can't create output file
+**Issue**: Cannot create output file
 
 **Solution**: Ensure write permissions in output directory
 
@@ -259,8 +227,7 @@ Now that you've completed your first migration:
 
 1. **Explore the Schema**: Use `sqlite3 <file>.db .schema` to see the generated tables
 2. **Add Indexes**: Create indexes for better query performance
-3. **Read the Full Documentation**: Check out the [Usage Guide](usage.md) for advanced features
-4. **Try Examples**: See [Examples](examples.md) for real-world scenarios
+3. **Read Type Mappings**: Check out the [Type Mappings](type_mappings.md) to understand data conversion
 
 ## Common Commands Reference
 
@@ -287,12 +254,6 @@ RUST_LOG=debug mongo-to-sqlite --database mydb --table test --output test.db
 
 ## Getting Help
 
-- **Documentation**: [Full Documentation](index.md)
-- **Examples**: [Real-world Examples](examples.md)
-- **Issues**: [GitHub Issues](https://github.com/yourusername/mongo-to-sqlite/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/mongo-to-sqlite/discussions)
-
----
-
-**Ready for more?** Check out the [Usage Guide](usage.md) for comprehensive documentation.
-
+- [Full Documentation](index.md)
+- [Type Mappings](type_mappings.md)
+- [GitHub Issues](https://github.com/Ppang0405/mongo-to-sqlite/issues)

@@ -2,10 +2,10 @@
 name = "mongo-to-sqlite"
 version = "0.1.0"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Ppang0405 <nguyentruong.xyz0405@gmail.com>"]
 description = "A CLI tool to migrate MongoDB databases to SQLite/LibSQL with schema inference"
 license = "MIT"
-repository = "https://github.com/yourusername/mongo-to-sqlite"
+repository = "https://github.com/Ppang0405/mongo-to-sqlite"
 keywords = ["mongodb", "sqlite", "migration", "cli", "database"]
 categories = ["command-line-utilities", "database"]
 

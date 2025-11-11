@@ -8,51 +8,41 @@ This tool provides a robust, efficient way to migrate MongoDB databases to SQLit
 
 ## Quick Links
 
-- [Architecture](architecture.md) - System design and components
+- [Quick Start](quickstart.md) - Get started in 5 minutes
 - [Type Mappings](type_mappings.md) - How MongoDB types map to SQLite
-- [Usage Guide](usage.md) - Detailed usage examples and workflows
-- [Configuration](configuration.md) - Environment variables and CLI options
-- [Examples](examples.md) - Real-world usage examples
 
-## Features
+## Key Features
 
-✨ **Automatic Schema Inference** - Analyzes MongoDB collections and generates appropriate SQLite schemas
+- Automatic schema inference from MongoDB collections
+- Flexible migration modes (schema only, data only, or both)
+- Selective migration (specific tables or all tables)
+- Support for Turso cloud databases and local SQLite files
+- Efficient batch processing for large datasets
+- Real-time progress tracking
+- Intelligent type mapping from MongoDB BSON to SQLite
 
-🔄 **Flexible Migration Modes** - Migrate schema only, data only, or both
+## Installation
 
-🎯 **Selective Migration** - Migrate specific tables or all tables at once
+Download the latest release for your platform from the [Releases page](https://github.com/Ppang0405/mongo-to-sqlite/releases).
 
-☁️ **Turso Cloud Support** - Write directly to Turso cloud databases or local SQLite files
-
-🚀 **Efficient Batch Processing** - Handles large datasets with configurable batch sizes
-
-📊 **Progress Tracking** - Real-time progress updates with beautiful CLI output
-
-🛡️ **Type Safety** - Intelligent type mapping from MongoDB BSON to SQLite types
-
-## Getting Started
-
-### Installation
+Extract and install:
 
 ```bash
-cargo install mongo-to-sqlite
+tar -xzf mongo-to-sqlite-*.tar.gz
+sudo mv mongo-to-sqlite /usr/local/bin/
 ```
 
-Or build from source:
+## Quick Start
+
+Migrate all collections to a local SQLite file:
 
 ```bash
-git clone https://github.com/yourusername/mongo-to-sqlite
-cd mongo-to-sqlite
-cargo build --release
-```
-
-### Quick Start
-
-```bash
-# Migrate all collections to local SQLite file
 mongo-to-sqlite --database mydb --all-tables --output mydb.db
+```
 
-# Migrate to Turso cloud
+Migrate to Turso cloud:
+
+```bash
 export TURSO_DATABASE_URL="libsql://your-database.turso.io"
 export TURSO_AUTH_TOKEN="your-auth-token"
 mongo-to-sqlite --database mydb --all-tables
@@ -60,20 +50,11 @@ mongo-to-sqlite --database mydb --all-tables
 
 ## Documentation Sections
 
-### [Architecture](architecture.md)
-Learn about the internal architecture, components, and data flow of the migration tool.
+### [Quick Start](quickstart.md)
+Get up and running in minutes with step-by-step instructions and common usage examples.
 
 ### [Type Mappings](type_mappings.md)
 Understand how MongoDB BSON types are converted to SQLite types, including handling of complex nested data.
-
-### [Usage Guide](usage.md)
-Comprehensive guide covering all command-line options, common workflows, and best practices.
-
-### [Configuration](configuration.md)
-Complete reference for environment variables, command-line arguments, and performance tuning.
-
-### [Examples](examples.md)
-Real-world examples and use cases, from simple migrations to complex production deployments.
 
 ## Common Use Cases
 
@@ -98,21 +79,6 @@ export TURSO_AUTH_TOKEN="$TURSO_TOKEN"
 mongo-to-sqlite --database app --all-tables
 ```
 
-## Support
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/mongo-to-sqlite/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/mongo-to-sqlite/discussions)
-- **Documentation**: [Full Documentation](https://yourusername.github.io/mongo-to-sqlite/)
-
-## Contributing
-
-Contributions are welcome! Please see our [Contributing Guide](../README.md#contributing) for details.
-
 ## License
 
 This project is licensed under the MIT License.
-
----
-
-**Next Steps**: Check out the [Usage Guide](usage.md) for detailed examples, or jump straight to [Examples](examples.md) for practical use cases.
-

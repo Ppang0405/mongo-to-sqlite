@@ -14,7 +14,7 @@ Thank you for your interest in contributing! This document provides guidelines f
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/mongo-to-sqlite
+   git clone https://github.com/Ppang0405/mongo-to-sqlite
    cd mongo-to-sqlite
    ```
 
