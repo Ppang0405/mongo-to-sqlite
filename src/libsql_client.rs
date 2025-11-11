@@ -5,13 +5,16 @@ use tracing::{debug, info};
 
 /// LibSQL client wrapper supporting both local and remote (Turso) databases
 pub struct LibSqlClient {
+    #[allow(dead_code)]
     database: Database,
     connection: Connection,
+    #[allow(dead_code)]
     mode: ConnectionMode,
 }
 
 /// Connection mode for LibSQL
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 enum ConnectionMode {
     Local(String),
     Remote { url: String },
@@ -105,6 +108,7 @@ impl LibSqlClient {
     ///
     /// # Returns
     /// Total number of rows affected
+    #[allow(dead_code)]
     pub async fn execute_batch(&self, statements: Vec<String>) -> Result<u64> {
         debug!("Executing batch of {} statements", statements.len());
         
@@ -143,6 +147,7 @@ impl LibSqlClient {
     ///
     /// # Returns
     /// Total number of rows inserted
+    #[allow(dead_code)]
     pub async fn execute_batch_inserts<P>(
         &self,
         sql: &str,
@@ -198,6 +203,7 @@ impl LibSqlClient {
     ///
     /// # Returns
     /// Rows result set
+    #[allow(dead_code)]
     pub async fn query(&self, sql: &str) -> Result<libsql::Rows> {
         debug!("Querying: {}", sql);
         let rows = self.connection.query(sql, ()).await?;
@@ -208,6 +214,7 @@ impl LibSqlClient {
     ///
     /// # Returns
     /// String describing the connection mode
+    #[allow(dead_code)]
     pub fn connection_info(&self) -> String {
         match &self.mode {
             ConnectionMode::Local(path) => format!("Local file: {}", path),
@@ -219,6 +226,7 @@ impl LibSqlClient {
     ///
     /// # Returns
     /// True if using local SQLite file, false if using Turso
+    #[allow(dead_code)]
     pub fn is_local(&self) -> bool {
         matches!(self.mode, ConnectionMode::Local(_))
     }
@@ -227,6 +235,7 @@ impl LibSqlClient {
     ///
     /// # Returns
     /// Optional path to the local SQLite file
+    #[allow(dead_code)]
     pub fn output_path(&self) -> Option<String> {
         match &self.mode {
             ConnectionMode::Local(path) => Some(path.clone()),

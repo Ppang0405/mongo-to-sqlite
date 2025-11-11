@@ -2,6 +2,7 @@ use thiserror::Error;
 
 /// Errors that can occur during migration
 #[derive(Error, Debug)]
+#[allow(dead_code)]
 pub enum MigrationError {
     /// MongoDB connection error
     #[error("MongoDB connection error: {0}")]
@@ -53,8 +54,10 @@ pub enum MigrationError {
 }
 
 /// Result type alias for migration operations
+#[allow(dead_code)]
 pub type MigrationResult<T> = Result<T, MigrationError>;
 
+#[allow(dead_code)]
 impl MigrationError {
     /// Create a new schema inference error
     pub fn schema_inference<S: Into<String>>(msg: S) -> Self {

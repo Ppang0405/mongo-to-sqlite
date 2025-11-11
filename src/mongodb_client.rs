@@ -135,7 +135,13 @@ impl MongoClient {
         let db = self.client.database(database_name);
         let collection = db.collection::<Document>(collection_name);
 
-        let cursor = collection.find(doc! {}, None).await?;
+        // Configure find options to prevent cursor timeout
+        let find_options = mongodb::options::FindOptions::builder()
+            .no_cursor_timeout(true)  // Prevent 10-minute cursor timeout
+            .batch_size(1000)          // Process in batches
+            .build();
+
+        let cursor = collection.find(doc! {}, find_options).await?;
 
         Ok(cursor)
     }
@@ -147,6 +153,7 @@ impl MongoClient {
     ///
     /// # Returns
     /// True if the database exists, false otherwise
+    #[allow(dead_code)]
     pub async fn database_exists(&self, database_name: &str) -> Result<bool> {
         let db_names = self.client.list_database_names(doc! {}, None).await?;
         Ok(db_names.contains(&database_name.to_string()))
@@ -160,6 +167,7 @@ impl MongoClient {
     ///
     /// # Returns
     /// True if the collection exists, false otherwise
+    #[allow(dead_code)]
     pub async fn collection_exists(
         &self,
         database_name: &str,
@@ -173,6 +181,7 @@ impl MongoClient {
     ///
     /// # Returns
     /// Reference to the MongoDB client
+    #[allow(dead_code)]
     pub fn client(&self) -> &Client {
         &self.client
     }
