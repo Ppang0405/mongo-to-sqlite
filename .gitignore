@@ -40,3 +40,6 @@ vendor/
 !CHANGELOG.md
 !CONTRIBUTING.md
 !docs/**/*.md
+
+.specstory/
+.cursorindexingignore
