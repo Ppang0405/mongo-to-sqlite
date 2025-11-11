@@ -1,4 +1,4 @@
-# MongoDB to SQLite Migration Tool
+# MongoDB to SQLite/LibSQL Migration Tool
 
 A command-line tool for migrating MongoDB databases to SQLite/LibSQL with automatic schema inference and type mapping.
 
